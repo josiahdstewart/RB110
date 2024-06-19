@@ -10,8 +10,10 @@ def prompt(msg)
   puts "=> #{msg}"
 end
 
-def display_board(brd)
+def display_board(brd, cmp_scr, ply_scr)
   system 'clear'
+  puts "First player to 5 wins!"
+  puts "Computer Score: #{cmp_scr} Player Score: #{ply_scr}"
   puts "You're an #{PLAYER_MARKER}"
   puts ""
   puts "     |     |"
@@ -88,12 +90,15 @@ def joinor(arr, delimiter=', ', conj='or')
   end
 end
 
+computer_score = 0
+player_score = 0
+
 loop do
   board = initialize_board
-  display_board(board)
+  display_board(board, computer_score, player_score)
 
   loop do
-    display_board(board)
+    display_board(board, computer_score, player_score)
 
     player_places_piece!(board)
     break if someone_won?(board) || board_full?(board)
@@ -102,17 +107,26 @@ loop do
     break if someone_won?(board) || board_full?(board)
   end
 
-  display_board(board)
+  display_board(board, computer_score, player_score)
 
   if someone_won?(board)
-    prompt "#{detect_winner(board)} won!"
+    prompt "#{detect_winner(board)} won a point!"
+    if detect_winner(board).start_with?('P')
+      player_score += 1
+    else
+      computer_score += 1
+    end
+
   else
     prompt "It's a tie!"
   end
 
+  break if computer_score == 5 || player_score == 5
   prompt "Play again? (y or n)"
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end
 
+prompt player_score > computer_score ? "Congrats, you won!" : "You lost :("
+prompt "Final Score: #{computer_score}-#{player_score}"
 prompt "Thanks for playing Tic Tac Toe! Good bye!"
