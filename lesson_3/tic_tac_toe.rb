@@ -11,6 +11,7 @@ def prompt(msg)
 end
 
 def display_board(brd, cmp_scr, ply_scr)
+  byebug
   system 'clear'
   puts "First player to 5 wins!"
   puts "Computer Score: #{cmp_scr} Player Score: #{ply_scr}"
@@ -52,8 +53,41 @@ def player_places_piece!(brd)
 end
 
 def computer_places_piece!(brd)
-  square = empty_squares(brd).sample
+  square = nil
+
+  # offense
+  WINNING_LINES.each do |line|
+    square = find_at_risk_square(line, brd, COMP_MARKER)
+    break if square
+  end
+
+  # defense
+  if !square
+    WINNING_LINES.each do |line|
+      square = find_at_risk_square(line, brd, PLAYER_MARKER)
+      break if square
+    end
+  end
+
+  # pick number 5
+  if  !square
+    square = 5
+  end
+
+  # just pick a square
+  if !square
+    square = empty_squares(brd).sample
+  end
+
   brd[square] = COMP_MARKER
+end
+
+def find_at_risk_square(line, board, marker)
+  if board.values_at(*line).count(marker) == 2
+    board.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.first
+  else
+    nil
+  end
 end
 
 def board_full?(brd)
@@ -94,17 +128,33 @@ computer_score = 0
 player_score = 0
 
 loop do
+  prompt "Would you like to for 1st or 2nd? (Enter 1 or 2)"
+  player_order = gets.chomp
+
   board = initialize_board
   display_board(board, computer_score, player_score)
+  byebug
 
-  loop do
-    display_board(board, computer_score, player_score)
+  if player_order == '2'
+    loop do
+      display_board(board, computer_score, player_score)
 
-    player_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+      computer_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
 
-    computer_places_piece!(board)
-    break if someone_won?(board) || board_full?(board)
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    end
+  else
+    loop do
+      display_board(board, computer_score, player_score)
+
+      player_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+
+      computer_places_piece!(board)
+      break if someone_won?(board) || board_full?(board)
+    end
   end
 
   display_board(board, computer_score, player_score)
