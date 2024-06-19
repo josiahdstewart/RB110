@@ -123,17 +123,24 @@ def joinor(arr, delimiter=', ', conj='or')
   end
 end
 
+def who_first_player
+  prompt "Would you like to go 1st or 2nd? (Enter 1 or 2)"
+  gets.chomp == '2' ? true : false
+end
+
+def who_first_computer
+  [true, false].sample
+end
+
 computer_score = 0
 player_score = 0
 
 loop do
-  prompt "Would you like to for 1st or 2nd? (Enter 1 or 2)"
-  player_order = gets.chomp
 
   board = initialize_board
   display_board(board, computer_score, player_score)
 
-  if player_order == '2'
+  if who_first_player
     loop do
       computer_places_piece!(board)
       display_board(board, computer_score, player_score)
