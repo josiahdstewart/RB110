@@ -11,7 +11,6 @@ def prompt(msg)
 end
 
 def display_board(brd, cmp_scr, ply_scr)
-  byebug
   system 'clear'
   puts "First player to 5 wins!"
   puts "Computer Score: #{cmp_scr} Player Score: #{ply_scr}"
@@ -70,7 +69,7 @@ def computer_places_piece!(brd)
   end
 
   # pick number 5
-  if  !square
+  if  !square && brd[5] == INITIAL_MARKER
     square = 5
   end
 
@@ -133,13 +132,11 @@ loop do
 
   board = initialize_board
   display_board(board, computer_score, player_score)
-  byebug
 
   if player_order == '2'
     loop do
-      display_board(board, computer_score, player_score)
-
       computer_places_piece!(board)
+      display_board(board, computer_score, player_score)
       break if someone_won?(board) || board_full?(board)
 
       player_places_piece!(board)
@@ -151,7 +148,6 @@ loop do
 
       player_places_piece!(board)
       break if someone_won?(board) || board_full?(board)
-
       computer_places_piece!(board)
       break if someone_won?(board) || board_full?(board)
     end
