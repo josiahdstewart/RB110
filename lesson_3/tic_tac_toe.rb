@@ -40,6 +40,14 @@ def empty_squares(brd)
   brd.keys.select { |num| brd[num] == INITIAL_MARKER }
 end
 
+def place_piece!(brd, curr_player)
+  if curr_player
+    player_places_piece!(brd)
+  else
+    computer_places_piece!(brd)
+  end
+end
+
 def player_places_piece!(brd)
   square = ''
   loop do
@@ -59,7 +67,6 @@ def computer_places_piece!(brd)
     square = find_at_risk_square(line, brd, COMP_MARKER)
     break if square
   end
-
   # defense
   if !square
     WINNING_LINES.each do |line|
@@ -67,12 +74,10 @@ def computer_places_piece!(brd)
       break if square
     end
   end
-
   # pick number 5
-  if  !square && brd[5] == INITIAL_MARKER
+  if !square && brd[5] == INITIAL_MARKER
     square = 5
   end
-
   # just pick a square
   if !square
     square = empty_squares(brd).sample
@@ -83,7 +88,7 @@ end
 
 def find_at_risk_square(line, board, marker)
   if board.values_at(*line).count(marker) == 2
-    board.select{|k,v| line.include?(k) && v == INITIAL_MARKER}.keys.first
+    board.select { |k, v| line.include?(k) && v == INITIAL_MARKER }.keys.first
   else
     nil
   end
@@ -125,21 +130,33 @@ end
 
 def who_first_player
   prompt "Would you like to go 1st or 2nd? (Enter 1 or 2)"
-  gets.chomp == '2' ? true : false
+  gets.chomp == '1'
 end
 
 def who_first_computer
   [true, false].sample
 end
 
+def alternate_player(current_player)
+  !current_player
+end
+
 computer_score = 0
 player_score = 0
 
 loop do
-
   board = initialize_board
   display_board(board, computer_score, player_score)
+  current_player = who_first_player
 
+  loop do
+    display_board(board, computer_score, player_score)
+    place_piece!(board, current_player)
+    current_player = alternate_player(current_player)
+    break if someone_won?(board) || board_full?(board)
+  end
+
+=begin
   if who_first_player
     loop do
       computer_places_piece!(board)
@@ -159,7 +176,7 @@ loop do
       break if someone_won?(board) || board_full?(board)
     end
   end
-
+=end
   display_board(board, computer_score, player_score)
 
   if someone_won?(board)
