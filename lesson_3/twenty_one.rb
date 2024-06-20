@@ -30,11 +30,29 @@ def hit!(deck)
   deck.delete(card)
   card
 end
-# for display: some kind each iterator? WHere for each card in hand, concatanate another string? use index to increment hand
+# for display: some kind each iterator? WHere for each card in hand, concatanate another string? use index to increment hand; maybe use String#center to get spacing righ with 10?
+def display_dealer_hand(hand)
+  dealer_hand = "DEALER : "
+  hand.each_with_index do |card, index|
+    dealer_hand << "#{card[0] + SUITS_SYMBOLS[card[1]]} | " unless index == hand.size - 1
+  end
+  dealer_hand << "UNKNOWN"
+  puts dealer_hand
+end
+
+def display_player_hand(hand)
+  player_hand = "YOU    : "
+  hand.each_with_index do |card, index|
+    player_hand << "#{card[0] + SUITS_SYMBOLS[card[1]]}"
+    player_hand << " | " unless index == hand.size - 1
+  end
+  puts player_hand
+end
+
 def display_hands(dealer_hand, player_hand)
   system 'clear'
-  puts "DEALER : #{dealer_hand[0][0] + SUITS_SYMBOLS[dealer_hand[0][1]]} | UNKNOWN"
-  puts "YOU    : #{player_hand[0][0] + SUITS_SYMBOLS[player_hand[0][1]]} | #{player_hand[1][0] + SUITS_SYMBOLS[player_hand[1][1]]}" 
+  display_dealer_hand(dealer_hand)
+  display_player_hand(player_hand)
 end
 
 loop do
