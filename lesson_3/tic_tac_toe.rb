@@ -1,7 +1,7 @@
-require 'byebug'
 INITIAL_MARKER = ' '
 PLAYER_MARKER = 'X'
 COMP_MARKER = 'O'
+WIN_SCORE = 5
 WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] +
                 [[1, 4, 7], [2, 5, 8], [3, 6, 9]] +
                 [[1, 5, 9], [3, 5, 7]]
@@ -12,7 +12,7 @@ end
 
 def display_board(brd, cmp_scr, ply_scr)
   system 'clear'
-  puts "First player to 5 wins!"
+  puts "First player to #{WIN_SCORE} wins!"
   puts "Computer Score: #{cmp_scr} Player Score: #{ply_scr}"
   puts "You're an #{PLAYER_MARKER}"
   puts ""
@@ -59,27 +59,37 @@ def player_places_piece!(brd)
   brd[square] = PLAYER_MARKER
 end
 
-def computer_places_piece!(brd)
+def computer_offense(brd)
   square = nil
 
-  # offense
   WINNING_LINES.each do |line|
     square = find_at_risk_square(line, brd, COMP_MARKER)
     break if square
   end
-  # defense
-  if !square
-    WINNING_LINES.each do |line|
-      square = find_at_risk_square(line, brd, PLAYER_MARKER)
-      break if square
-    end
+
+  square
+end
+
+def computer_defense(brd)
+  square = nil
+
+  WINNING_LINES.each do |line|
+    square = find_at_risk_square(line, brd, PLAYER_MARKER)
+    break if square
   end
-  # pick number 5
-  if !square && brd[5] == INITIAL_MARKER
+
+  square
+end
+
+def computer_places_piece!(brd)
+  square = computer_offense(brd)
+  square = computer_defense(brd) if !square
+
+  if !square && brd[5] == INITIAL_MARKER # pick number 5
     square = 5
   end
-  # just pick a square
-  if !square
+
+  if !square # just pick random square
     square = empty_squares(brd).sample
   end
 
@@ -156,27 +166,6 @@ loop do
     break if someone_won?(board) || board_full?(board)
   end
 
-=begin
-  if who_first_player
-    loop do
-      computer_places_piece!(board)
-      display_board(board, computer_score, player_score)
-      break if someone_won?(board) || board_full?(board)
-
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-    end
-  else
-    loop do
-      display_board(board, computer_score, player_score)
-
-      player_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-      computer_places_piece!(board)
-      break if someone_won?(board) || board_full?(board)
-    end
-  end
-=end
   display_board(board, computer_score, player_score)
 
   if someone_won?(board)
@@ -191,8 +180,8 @@ loop do
     prompt "It's a tie!"
   end
 
-  break if computer_score == 5 || player_score == 5
-  prompt "Play again? (y or n)"
+  break if computer_score == WIN_SCORE || player_score == WIN_SCORE
+  prompt "Play again? Tied score goes to the computer. (y or n)"
   answer = gets.chomp
   break unless answer.downcase.start_with?('y')
 end
