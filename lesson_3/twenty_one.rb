@@ -30,7 +30,7 @@ def hit!(deck)
   deck.delete(card)
   card
 end
-
+# for display: some kind each iterator? WHere for each card in hand, concatanate another string? use index to increment hand
 def display_hands(dealer_hand, player_hand)
   system 'clear'
   puts "DEALER : #{dealer_hand[0][0] + SUITS_SYMBOLS[dealer_hand[0][1]]} | UNKNOWN"
