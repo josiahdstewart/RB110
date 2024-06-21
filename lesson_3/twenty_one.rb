@@ -1,3 +1,4 @@
+require 'byebug'
 RANK = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
 SUITS = ['H', 'D', 'C', 'S']
 SUITS_SYMBOLS = { 'H' => "♥", 'D' => "♦", 'C' => "♣", 'S' => "♠" }
@@ -123,29 +124,37 @@ def dealer_turn(deck, dealer_hand, player_hand)
   end
 end
 
+def play_again?
+  prompt "Do you want to play again? (y/n)"
+  gets.chomp.downcase.start_with?('y')
+end
+
 loop do
+  byebug
   deck = initialize_deck
   player_hand = deal_cards!(deck)
   dealer_hand = deal_cards!(deck)
   display_hands(dealer_hand, player_hand)
 
   player_turn(deck, dealer_hand, player_hand)
+  player_total = total(player_hand)
 
-  if bust?(total(player_hand))
-    prompt "DEALER WON. YOU BUSTED WITH #{total(player_hand)}"
+  if bust?(player_total)
+    prompt "DEALER WON. YOU BUSTED WITH #{(player_total)}"
   else
     prompt "You stayed!"
     dealer_turn(deck, dealer_hand, player_hand)
   end
 
-  if bust?(total(dealer_hand))
-    prompt "YOU WON. THE DEALER BUSTED WITH #{total(dealer_hand)}"
-  elsif !bust?(total(player_hand))
+  dealer_total = total(dealer_hand)
+
+  if bust?(dealer_total)
+    prompt "YOU WON. THE DEALER BUSTED WITH #{dealer_total}"
+  elsif !bust?(player_total)
     display_results(dealer_hand, player_hand)
   end
 
-  prompt "Do you want to play again? (y/n)"
-  break unless gets.chomp == 'y'
+  break unless play_again?
 end
 
 prompt "Thanks for playing Twenty-One!"
